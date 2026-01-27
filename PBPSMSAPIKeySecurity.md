@@ -1,4 +1,4 @@
-## **Here's how PBS stores the Pushbullet API key:**
+## **Here's how PBS stores the Pushbullet API key**
 
 ## **Storage Method**
 - **Location**: `%AppData%\PBSMS\settings.dat` (per-user ApplicationData folder)
