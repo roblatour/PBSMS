@@ -1,4 +1,5 @@
-# PBSMS - Send SMSs (text messages) using Pushbullet via the Windows command line (v1 January 27, 2026)
+# PBSMS v1 (January 27, 2026)
+
 PBSMS is a free open source Command Line Interface program for Windows® to send text messages using [Pushbullet](https://www.pushbullet.com/)®.
 
 ## Key Features
