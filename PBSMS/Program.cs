@@ -240,7 +240,7 @@ namespace PBSMS
             Console.ForegroundColor = ConsoleColor.White;
 
             Console.WriteLine();
-            Console.WriteLine($"PBSMS v{GetVersionLabel()} - A Windows Command Line Interface to send SMS messages using Pushbullet");
+            Console.WriteLine($"PBSMS v{GetVersionLabel()} - A Windows Command Line Interface program to send SMS messages using Pushbullet");
 
             Console.WriteLine();
             WriteToConsoleInColour(ConsoleColor.White, "Usage:");
