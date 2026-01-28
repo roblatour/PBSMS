@@ -19,20 +19,20 @@ PBSMS is a free open source Command Line Interface program for Windows® to send
 5. At the Windows Command prompt, from the folder that you copied the program into, enter pbsms to see the help.<br>
    For example:
    ```
-   C:\Program Files\PBSMS> pbsms
+   pbsms
    ```
 
 6. Next, in order for PBSMS to be able to send a text it must first be provided with a Pushbullet API key.<br>
    Here is an example:
    ```
-   C:\Program Files\PBSMS> pbsms APIKey=o.abc1def2ghi3klm5mno6pqr7stu8vwx9
+   pbsms APIKey=o.abc1def2ghi3klm5mno6pqr7stu8vwx9
    ```
    Later, if the API Key changes simply re-issue the above command using the new API key.
 7. To send a text message  provide the program with the destination phone number and message.<br>
    Here is an example:
    
    ```
-   C:\Program Files\PBSMS> pbsms +15551234567 "Yeah, I won the Loto!"
+   pbsms +15551234567 "Yeah, I won the Loto!"
    ```
 
 9. (Optionally) use the program in a batch / script file to access its return code.
@@ -47,7 +47,7 @@ PBSMS is a free open source Command Line Interface program for Windows® to send
     ```
 9. (Optionally) To remove (delete) the API key enter:
    ```
-   C:\Program Files\PBSMS> pbsms APIKey=remove
+   pbsms APIKey=remove
    ```
 
 ## License
