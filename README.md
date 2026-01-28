@@ -1,6 +1,6 @@
 # PBSMS v1 (January 27, 2026)
 
-PBSMS is a free open source Command Line Interface program for Windows® for sending text messages using [Pushbullet](https://www.pushbullet.com/)®.
+PBSMS is a free open source Windows® Command Line Interface program for sending text messages using [Pushbullet](https://www.pushbullet.com/)®.
 
 ## Key Features
 
