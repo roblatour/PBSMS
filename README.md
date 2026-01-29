@@ -26,7 +26,7 @@ PBSMS is a free open source Windows® Command Line Interface program for sending
    Later, if the API Key changes simply re-issue the above command using the new API key.
 7. To send a text message provide the program with the destination phone number and message.<br>
    ```
-   pbsms +15551234567 "Yeah, I won the Loto!"
+   pbsms +15551234567 "Yeah, I won the Lotto!"
    ```
 8. (Optionally) Use the program in a batch / script file to access its return code.
     Here is an example batch file (.bat):
