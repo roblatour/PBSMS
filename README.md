@@ -11,7 +11,7 @@ PBSMS is a free open source Windows® Command Line Interface program for sending
 
 ## Setup and usage
 
-1. Download the PBSMS program (in a zip file) from [here](https://github.com/roblatour/PBSMS/releases/tag/v1.0.0.0).
+1. Download the PBSMS program (in a zip file) from [here](https://github.com/roblatour/PBSMS/releases/tag/v1.1.0.0).
 2. Extract the  program from the downloaded zip file.
 3. (Optionally) create a new folder from which you would like the program to run. 
 4. Copy the executable program (pbsms.exe) extracted in step 2 to the folder from which you would like it to run.
