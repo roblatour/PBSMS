@@ -6,7 +6,7 @@ PBSMS is a free open source Windows® Command Line Interface program for sending
 
 - Sends text messages from the Windows command line
 - The Pushbullet API Key only needs to be provided once and it will be securely saved as outlined [here](https://github.com/roblatour/PBSMS/blob/main/PBPSMSAPIKeySecurity.md) - with no need to include it in batch/script files
-- Version checking to easily see if you're running the latest release or a beta version
+- Version checking to easily see if you're running the latest release
 
 
 ## Setup and usage
