@@ -17,6 +17,7 @@ namespace PBSMS
     [JsonSerializable(typeof(ErrorResponse))]
     [JsonSerializable(typeof(SmsData))]
     [JsonSerializable(typeof(CurrentUserResponse))]
+    [JsonSerializable(typeof(GitHubRelease[]))]
     internal partial class AppJsonSerializerContext : JsonSerializerContext
     {
     }
@@ -35,6 +36,12 @@ namespace PBSMS
             if (args.Length == 0)
             {
                 ShowHelp();
+                return 0;
+            }
+
+            if (args.Length == 1 && args[0].Equals("version", StringComparison.OrdinalIgnoreCase))
+            {
+                await ShowVersionInfo();
                 return 0;
             }
 
@@ -234,6 +241,124 @@ namespace PBSMS
             return string.Join('.', parts);
         }
 
+        static async Task ShowVersionInfo()
+        {
+            var localVersion = Assembly.GetExecutingAssembly().GetName().Version;
+            if (localVersion == null)
+            {
+                WriteToConsoleInColour(ConsoleColor.Red, "Error: Unable to determine local version.");
+                return;
+            }
+
+            string localVersionStr = localVersion.ToString();
+            Console.WriteLine();
+            WriteToConsoleInColour(ConsoleColor.White, $"Running version: {localVersionStr}");
+
+            try
+            {
+                using var client = new HttpClient
+                {
+                    Timeout = TimeSpan.FromSeconds(10)
+                };
+                client.DefaultRequestHeaders.Add("User-Agent", "PBSMS");
+
+                var response = await client.GetAsync("https://api.github.com/repos/roblatour/PBSMS/releases");
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    WriteToConsoleInColour(ConsoleColor.Yellow, "Current version: Could not determine the current version.");
+                    Console.WriteLine();
+                    return;
+                }
+
+                var releasesJson = await response.Content.ReadAsStringAsync();
+                var releases = JsonSerializer.Deserialize(releasesJson, AppJsonSerializerContext.Default.GitHubReleaseArray);
+
+                if (releases == null || releases.Length == 0)
+                {
+                    WriteToConsoleInColour(ConsoleColor.Yellow, "Current version: Could not determine the current version.");
+                    Console.WriteLine();
+                    return;
+                }
+
+                var stableReleases = releases.Where(r => !r.Prerelease && !string.IsNullOrEmpty(r.TagName)).ToList();
+                var betaReleases = releases.Where(r => r.Prerelease && !string.IsNullOrEmpty(r.TagName)).ToList();
+
+                GitHubRelease? latestStable = stableReleases.FirstOrDefault();
+                GitHubRelease? latestBeta = betaReleases.FirstOrDefault();
+
+                if (latestStable == null)
+                {
+                    WriteToConsoleInColour(ConsoleColor.Yellow, "Current version: Could not determine the current version.");
+                    Console.WriteLine();
+                    return;
+                }
+
+                string latestStableTag = latestStable.TagName!.TrimStart('v');
+                Version? latestStableVersion = Version.TryParse(latestStableTag, out var stableVer) ? stableVer : null;
+
+                if (latestStableVersion == null)
+                {
+                    WriteToConsoleInColour(ConsoleColor.Yellow, "Current version: Could not determine the current version.");
+                    Console.WriteLine();
+                    return;
+                }
+
+                WriteToConsoleInColour(ConsoleColor.White, $"Current version: {latestStableVersion}");
+
+                int comparison = localVersion.CompareTo(latestStableVersion);
+
+                if (comparison < 0)
+                {
+                    Console.WriteLine();
+                    WriteToConsoleInColour(ConsoleColor.Yellow, "You are running an out of date version.");
+                    WriteToConsoleInColour(ConsoleColor.Yellow, $"Download the latest version at: {latestStable.HtmlUrl}");
+                }
+                else if (comparison == 0)
+                {
+                    Console.WriteLine();
+                    WriteToConsoleInColour(ConsoleColor.Green, "You are running the current version.");
+                }
+                else
+                {
+                    Console.WriteLine();
+                    WriteToConsoleInColour(ConsoleColor.Cyan, "You are running a beta version.");
+                }
+
+                if (latestBeta != null)
+                {
+                    string latestBetaTag = latestBeta.TagName!.TrimStart('v');
+                    Version? latestBetaVersion = Version.TryParse(latestBetaTag, out var betaVer) ? betaVer : null;
+
+                    if (latestBetaVersion != null && latestBetaVersion > latestStableVersion)
+                    {
+                        Console.WriteLine();
+                        WriteToConsoleInColour(ConsoleColor.Cyan, $"A beta version {latestBetaVersion} is also available.");
+                        WriteToConsoleInColour(ConsoleColor.Cyan, $"Download the beta version at: {latestBeta.HtmlUrl}");
+                    }
+                }
+
+                Console.WriteLine();
+            }
+            catch (TaskCanceledException)
+            {
+                if (!await CheckInternetConnectivity())
+                {
+                    WriteToConsoleInColour(ConsoleColor.Yellow, "Current version: Could not determine the current version - the network appears to be down.");
+                }
+                else
+                {
+                    WriteToConsoleInColour(ConsoleColor.Yellow, "Current version: Could not determine the current version.");
+                }
+                Console.WriteLine();
+            }
+            catch
+            {
+                WriteToConsoleInColour(ConsoleColor.Yellow, "Current version: Could not determine the current version.");
+                Console.WriteLine();
+            }
+        }
+
         static void ShowHelp()
         {
 
@@ -255,6 +380,10 @@ namespace PBSMS
             WriteToConsoleInColour(ConsoleColorOriginal, "   pbsms <phone number> <message>");
 
             Console.WriteLine();
+            WriteToConsoleInColour(ConsoleColorOriginal, "To check for updates:");
+            WriteToConsoleInColour(ConsoleColorOriginal, "   pbsms version");
+
+            Console.WriteLine();
             WriteToConsoleInColour(ConsoleColor.White, "Arguments:");
             WriteToConsoleInColour(ConsoleColorOriginal, "Pushbullet API key      Pushbullet API key");
             WriteToConsoleInColour(ConsoleColorOriginal, "phone number            Destination phone number in international format (e.g., +1234567890)");
@@ -264,6 +393,7 @@ namespace PBSMS
             WriteToConsoleInColour(ConsoleColor.White, "Examples:");
             WriteToConsoleInColour(ConsoleColorOriginal, "pbsms APIKey=o.abc1def2ghi3klm5mno6pqr7stu8vwx9");
             WriteToConsoleInColour(ConsoleColorOriginal, "pbsms +15551234567 \"Hello world\"");
+            WriteToConsoleInColour(ConsoleColorOriginal, "pbsms version");
 
             Console.WriteLine();
             WriteToConsoleInColour(ConsoleColor.White, "Return codes:");
@@ -534,5 +664,17 @@ namespace PBSMS
 
         [JsonPropertyName("name")]
         public string? Name { get; set; }
+    }
+
+    internal class GitHubRelease
+    {
+        [JsonPropertyName("tag_name")]
+        public string? TagName { get; set; }
+
+        [JsonPropertyName("prerelease")]
+        public bool Prerelease { get; set; }
+
+        [JsonPropertyName("html_url")]
+        public string? HtmlUrl { get; set; }
     }
 }
